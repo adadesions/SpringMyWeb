@@ -65,5 +65,10 @@ public class CoffeeController {
         return (coffeeIdx == -1) ? postCoffee(coffee) : coffee;
     }
 
+    @DeleteMapping("/coffees/{id}")
+    void deleteCoffee(@PathVariable String id) {
+        store.removeIf(coffee -> coffee.getId().equals(id));
+    }
+
 
 }
