@@ -52,5 +52,18 @@ public class CoffeeController {
         return coffee;
     }
 
+    @PutMapping("/coffees/{id}")
+    Coffee putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
+        int coffeeIdx = -1;
+        for (Coffee c : store) {
+            if (c.getId().equals(id)) {
+                coffeeIdx = store.indexOf(c);
+                store.set(coffeeIdx, coffee);
+            }
+        }
+
+        return (coffeeIdx == -1) ? postCoffee(coffee) : coffee;
+    }
+
 
 }
