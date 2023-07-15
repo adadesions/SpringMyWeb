@@ -1,9 +1,7 @@
 package com.adabrain.myweb.controllers;
 
 import com.adabrain.myweb.models.Coffee;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +44,12 @@ public class CoffeeController {
         }
 
         return Optional.empty();
+    }
+
+    @PostMapping("/coffees")
+    Coffee postCoffee(@RequestBody Coffee coffee) {
+        store.add(coffee);
+        return coffee;
     }
 
 
