@@ -1,9 +1,14 @@
 package com.adabrain.myweb.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 import java.util.UUID;
 
+@Entity
 public class Coffee {
-    private final String id;
+    @Id
+    private String id;
     private String name;
 
     public Coffee(String id, String name) {
@@ -13,6 +18,10 @@ public class Coffee {
 
     public Coffee(String name) {
         this(UUID.randomUUID().toString(), name);
+    }
+
+    public Coffee() {
+
     }
 
     public String getId() {
