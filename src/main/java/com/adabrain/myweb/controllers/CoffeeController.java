@@ -1,43 +1,42 @@
 package com.adabrain.myweb.controllers;
 
 import com.adabrain.myweb.models.Coffee;
+import com.adabrain.myweb.models.CoffeeRepository;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/coffees")
 public class CoffeeController {
-    List<Coffee> store = new ArrayList<>();
+    private final CoffeeRepository coffeeRepository;
 
-    public CoffeeController() {
-        store.addAll(List.of(
+    public CoffeeController(CoffeeRepository coffeeRepository) {
+        this.coffeeRepository = coffeeRepository;
+        
+        this.coffeeRepository.saveAll(List.of(
                 new Coffee("Americano"),
                 new Coffee("Es-Yen"),
                 new Coffee("Espresso")
         ));
     }
 
-    @GetMapping("/coffees")
+    @GetMapping
     Iterable<Coffee> getCoffees() {
-        return store;
+        return coffeeRepository.findAll();
     }
 
-    @GetMapping("/coffees/{id}")
+    @GetMapping("/{id}")
     Optional<Coffee> getCoffeeById(@PathVariable String id) {
-        for (Coffee c : store) {
-            if (c.getId().equals(id)) {
-                return Optional.of(c);
-            }
-        }
-
-        return Optional.empty();
+        return coffeeRepository.findById(id);
     }
 
-    @GetMapping("/coffees/name/{name}")
+    @GetMapping("/name/{name}")
     Optional<Coffee> getCoffeeByName(@PathVariable String name) {
-        for (Coffee c : store) {
+        for (Coffee c : coffeeRepository.findAll()) {
             if (c.getName().equals(name)) {
                 return Optional.of(c);
             }
@@ -46,29 +45,22 @@ public class CoffeeController {
         return Optional.empty();
     }
 
-    @PostMapping("/coffees")
+    @PostMapping
     Coffee postCoffee(@RequestBody Coffee coffee) {
-        store.add(coffee);
+        coffeeRepository.save(coffee);
         return coffee;
     }
 
-    @PutMapping("/coffees/{id}")
-    Coffee putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
-        int coffeeIdx = -1;
-        for (Coffee c : store) {
-            if (c.getId().equals(id)) {
-                coffeeIdx = store.indexOf(c);
-                store.set(coffeeIdx, coffee);
-            }
-        }
-
-        return (coffeeIdx == -1) ? postCoffee(coffee) : coffee;
+    @PutMapping("/{id}")
+    ResponseEntity<Coffee> putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
+        return (!coffeeRepository.existsById(id))
+                ? new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.CREATED)
+                : new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.OK);
     }
 
-    @DeleteMapping("/coffees/{id}")
-    void deleteCoffee(@PathVariable String id) {
-        store.removeIf(coffee -> coffee.getId().equals(id));
+    @DeleteMapping("/{id}")
+    ResponseEntity<String> deleteCoffee(@PathVariable String id) {
+        coffeeRepository.deleteById(id);
+        return new ResponseEntity<>("Deleted", HttpStatus.OK);
     }
-
-
 }
