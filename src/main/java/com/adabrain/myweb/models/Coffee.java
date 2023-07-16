@@ -35,4 +35,8 @@ public class Coffee {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String info() {
+        return "Class: Coffee,  ID: " + this.id + " Name: " + this.name;
+    }
 }

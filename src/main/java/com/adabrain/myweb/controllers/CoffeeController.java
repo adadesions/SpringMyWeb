@@ -2,14 +2,18 @@ package com.adabrain.myweb.controllers;
 
 import com.adabrain.myweb.models.Coffee;
 import com.adabrain.myweb.models.CoffeeRepository;
-import org.apache.coyote.Response;
+import lombok.extern.log4j.Log4j2;
+import org.apache.el.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @RestController
+@Log4j2
+
 @RequestMapping("/coffees")
 public class CoffeeController {
     private final CoffeeRepository coffeeRepository;
@@ -26,6 +30,7 @@ public class CoffeeController {
 
     @GetMapping
     Iterable<Coffee> getCoffees() {
+        log.debug("Someone get all coffee.");
         return coffeeRepository.findAll();
     }
 
@@ -45,9 +50,18 @@ public class CoffeeController {
         return Optional.empty();
     }
 
+    @GetMapping("/search")
+    Optional<Coffee> getCoffeeBySearch(@RequestParam String name) {
+        return StreamSupport
+                .stream(coffeeRepository.findAll().spliterator(), false)
+                .filter(coffee -> coffee.getName().equals(name))
+                .findFirst();
+    }
+
     @PostMapping
     Coffee postCoffee(@RequestBody Coffee coffee) {
         coffeeRepository.save(coffee);
+        log.trace("[POST] create new coffee" + coffee.info());
         return coffee;
     }
 
